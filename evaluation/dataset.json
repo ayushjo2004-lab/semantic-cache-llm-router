@@ -1,0 +1,17 @@
+[
+  {"query":"What is Python?"},
+  {"query":"Explain Python programming"},
+  {"query":"What is a Python list?"},
+  {"query":"Explain lists in Python"},
+  {"query":"What is an API?"},
+  {"query":"Explain REST APIs"},
+  {"query":"What is SQL?"},
+  {"query":"Explain SQL databases"},
+  {"query":"Compare SQL and NoSQL databases"},
+  {"query":"Design a scalable RAG architecture"},
+  {"query":"How does a Python dictionary work?"},
+  {"query":"Debug this Python algorithm"},
+  {"query":"What is machine learning?"},
+  {"query":"Explain machine learning simply"},
+  {"query":"What is an embedding?"}
+]
