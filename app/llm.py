@@ -2,7 +2,7 @@ import requests
 
 OLLAMA_URL = "http://localhost:11434"
 
-SMALL_MODEL = "llama3.2:3b"
+SMALL_MODEL = "llama3.2:1b"
 LARGE_MODEL = "llama3.2:3b"
 
 
