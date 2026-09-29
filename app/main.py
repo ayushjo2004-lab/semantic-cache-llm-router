@@ -55,9 +55,13 @@ def query(body: Query):
 def metrics():
     s = request_stats()
     return {
-        "total_requests": s["total"],
-        "cache_hits": s["hits"],
-        "cache_hit_rate_percent": round(s["cache_hit_rate"], 2),
-        "average_latency_ms": round(s["avg_latency_ms"], 2),
-        "estimated_total_cost_usd": round(s["total_cost"], 6),
-    }
+     "answer": answer,
+    "model": model,
+    "cache_hit": False,
+    "route": route_name,
+    "similarity": None,
+    "latency_ms": round(latency, 2),
+    "input_tokens": inp,
+    "output_tokens": out,
+    "estimated_cost": round(cost, 8)
+}
