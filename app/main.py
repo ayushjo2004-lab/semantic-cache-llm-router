@@ -6,7 +6,7 @@ from .embeddings import embed
 from .cache import find_similar
 from .router import route
 from .llm import ask
-from .config import CACHE_THRESHOLD
+from .config import CACHE_THRESHOLD, MAX_ROUTE_COST
 
 init_db()
 app = FastAPI(title="Semantic Cache + Cost-Aware LLM Router", version="1.0")
@@ -38,7 +38,7 @@ def query(body: Query):
             "latency_ms": round(latency, 2), "estimated_cost": 0
         }
 
-    route_name = route(body.query)
+    route_name = route(body.query, MAX_ROUTE_COST) 
     answer, model, inp, out, cost = ask(body.query, route_name)
     add_cache(body.query, embedding, answer, model)
 
@@ -46,10 +46,16 @@ def query(body: Query):
     log_request(body.query, model, False, latency, inp, out, cost)
 
     return {
-        "answer": answer, "model": model, "cache_hit": False,
-        "route": route_name, "similarity": None,
-        "latency_ms": round(latency, 2), "estimated_cost": round(cost, 8)
-    }
+    "answer": answer,
+    "model": model,
+    "cache_hit": True,
+    "route": "cached",
+    "similarity": round(cached["score"], 4),
+    "latency_ms": round(latency, 2),
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "estimated_cost": 0
+}
 
 @app.get("/metrics")
 def metrics():
