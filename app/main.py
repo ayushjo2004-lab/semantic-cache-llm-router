@@ -34,8 +34,12 @@ def query(body: Query):
         log_request(body.query, model, True, latency, 0, 0, 0)
         return {
             "answer": answer, "model": model, "cache_hit": True,
+            "route": "cached",
             "similarity": round(cached["score"], 4),
-            "latency_ms": round(latency, 2), "estimated_cost": 0
+            "latency_ms": round(latency, 2),
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "estimated_cost": 0,
         }
 
     route_name = route(body.query, MAX_ROUTE_COST) 
@@ -46,28 +50,37 @@ def query(body: Query):
     log_request(body.query, model, False, latency, inp, out, cost)
 
     return {
-    "answer": answer,
-    "model": model,
-    "cache_hit": True,
-    "route": "cached",
-    "similarity": round(cached["score"], 4),
-    "latency_ms": round(latency, 2),
-    "input_tokens": 0,
-    "output_tokens": 0,
-    "estimated_cost": 0
-}
+        "answer": answer,
+        "model": model,
+        "cache_hit": False,
+        "route": route_name,
+        "similarity": None,
+        "latency_ms": round(latency, 2),
+        "input_tokens": inp,
+        "output_tokens": out,
+        "estimated_cost": round(cost, 8),
+    }
 
 @app.get("/metrics")
 def metrics():
     s = request_stats()
     return {
-     "answer": answer,
-    "model": model,
-    "cache_hit": False,
-    "route": route_name,
-    "similarity": None,
-    "latency_ms": round(latency, 2),
-    "input_tokens": inp,
-    "output_tokens": out,
-    "estimated_cost": round(cost, 8)
-}
+        "total_requests": s["total"],
+        "cache_hit_rate_percent": round(s["cache_hit_rate"], 2),
+        "average_latency_ms": round(s["avg_latency_ms"], 2),
+        "estimated_total_cost_usd": round(s["total_cost"], 8),
+        "cache_hits": s["hits"],
+        "cache_misses": s["total"] - s["hits"],
+        "model_usage": s["model_usage"],
+        "recent_requests": [
+            {
+                "query": row[0],
+                "model": row[1],
+                "cache_hit": bool(row[2]),
+                "latency_ms": round(row[3], 2),
+                "estimated_cost_usd": round(row[4], 8),
+                "created_at": row[5],
+            }
+            for row in s["recent"]
+        ],
+    }

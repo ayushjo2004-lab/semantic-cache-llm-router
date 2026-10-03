@@ -54,8 +54,12 @@ def request_stats():
             SELECT query, model, cache_hit, latency_ms, estimated_cost, created_at
             FROM requests ORDER BY id DESC LIMIT 100
         """).fetchall()
+        model_rows = con.execute("""
+            SELECT model, COUNT(*) FROM requests GROUP BY model ORDER BY COUNT(*) DESC
+        """).fetchall()
     return {
         "total": total, "hits": hits, "cache_hit_rate": (hits/total*100 if total else 0),
         "avg_latency_ms": latency, "total_cost": cost,
-        "recent": rows
+        "recent": rows,
+        "model_usage": [{"model": model, "requests": count} for model, count in model_rows],
     }
